@@ -1,5 +1,7 @@
 import '@/app/ui/global.css';
 import { inter } from '@/app/ui/font';
+import { QueryClientProvider } from '@tanstack/react-query';
+import { getQueryClient } from './lib/query-client';
 
 export default function RootLayout({
   children,
@@ -7,8 +9,10 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={`${inter.className} antialiased`}>{children}</body>
-    </html>
+    // <QueryClientProvider client={getQueryClient()}>
+      <html lang="en">
+        <body className={`${inter.className} antialiased`}>{children}</body>
+      </html>
+    // </QueryClientProvider>
   );
 }
