@@ -8,7 +8,6 @@ import { getUsers } from '@/app/query/queries';
 
 
 export default async function Page() {
-  const users = await getUsers();
 
   return (
     <main>
