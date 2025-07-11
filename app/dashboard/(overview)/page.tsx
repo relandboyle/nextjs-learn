@@ -4,10 +4,19 @@ import { lusitana } from '@/app/ui/font';
 import { Suspense } from 'react';
 import { CardsSkeleton, LatestInvoicesSkeleton, RevenueChartSkeleton } from '@/app/ui/skeletons';
 import CardWrapper from '@/app/ui/dashboard/cards';
-import { getUsers } from '@/app/query/queries';
+
+import { dehydrate, HydrationBoundary, QueryClient } from '@tanstack/react-query';
+import { fetchLatestInvoices } from '@/app/lib/data';
 
 
 export default async function Page() {
+
+  const queryClient = new QueryClient();
+  await queryClient.prefetchQuery({
+    queryKey: ['latestInvoices'],
+    queryFn: fetchLatestInvoices,
+  });
+  const dehydratedState = dehydrate(queryClient);
 
   return (
     <main>
@@ -23,9 +32,13 @@ export default async function Page() {
         <Suspense fallback={<RevenueChartSkeleton />}>
           <RevenueChart />
         </Suspense>
+
         <Suspense fallback={<LatestInvoicesSkeleton />}>
-          <LatestInvoices />
+          <HydrationBoundary state={dehydratedState}>
+            <LatestInvoices />
+          </HydrationBoundary>
         </Suspense>
+
       </div>
     </main>
   );

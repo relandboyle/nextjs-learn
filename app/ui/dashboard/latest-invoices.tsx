@@ -1,13 +1,29 @@
+'use client'
+
 import { ArrowPathIcon } from '@heroicons/react/24/outline';
-import clsx from 'clsx';
 import Image from 'next/image';
 import { lusitana } from '@/app/ui/font';
-import { LatestInvoice } from '@/app/lib/definitions';
-import { fetchLatestInvoices } from '@/app/lib/data';
+import { useQuery } from '@tanstack/react-query';
+import clsx from 'clsx';
 
 
-export default async function LatestInvoices() {
-  const latestInvoices = await fetchLatestInvoices();
+export default function LatestInvoices() {
+
+  const { data, error, isLoading } = useQuery({
+    queryKey: ['latestInvoices'],
+    queryFn: async () => {
+      const response = await fetch('/api/invoices/latest');
+      if (!response.ok) {
+        throw new Error('Failed to fetch latest invoices');
+      }
+      return response.json();
+    },
+    refetchInterval: 60 * 1000,
+  });
+
+
+  if (isLoading) return <div>Loading...</div>;
+  if (error) return <div>Error loading invoices: { error.message }</div>
 
 
   return (
@@ -19,7 +35,7 @@ export default async function LatestInvoices() {
         {/* NOTE: Uncomment this code in Chapter 7 */}
 
         <div className="bg-white px-6">
-          {latestInvoices.map((invoice, i) => {
+          {data?.map((invoice: any, i: number) => {
             return (
               <div
                 key={invoice.id}
@@ -56,6 +72,7 @@ export default async function LatestInvoices() {
             );
           })}
         </div>
+
         <div className="flex items-center pb-2 pt-6">
           <ArrowPathIcon className="h-5 w-5 text-gray-500" />
           <h3 className="ml-2 text-sm text-gray-500 ">Updated just now</h3>
